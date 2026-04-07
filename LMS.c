@@ -50,9 +50,9 @@ void showMenu()
 {
     printf("\n\n");
     printLine();
-    printf("  ||                                      ||\n");
-    printf("  ||       TYPES OF LOANS AVAILABLE       ||\n");
-    printf("  ||                                      ||\n");
+    printf("  ||                                  ||\n");
+    printf("  ||     TYPES OF LOANS AVAILABLE     ||\n");
+    printf("  ||                                  ||\n");
     printLine();
     printf("\n");
     printf("    [ 1 ]  Personal Loan\n");
