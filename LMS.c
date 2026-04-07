@@ -5,17 +5,17 @@
 
 void printLine()
 {
-    printf("  ================================================\n");
+    printf("  ======================================\n");
 }
 
 void showWelcome()
 {
     printf("\n\n");
     printLine();
-    printf("  ||                                            ||\n");
-    printf("  ||           WELCOME TO                       ||\n");
-    printf("  ||      LOAN MANAGEMENT SYSTEM                ||\n");
-    printf("  ||                                            ||\n");
+    printf("  ||                                  ||\n");
+    printf("  ||           WELCOME TO             ||\n");
+    printf("  ||      LOAN MANAGEMENT SYSTEM      ||\n");
+    printf("  ||                                  ||\n");
     printLine();
     printf("\n");
     printf("    Simple | Fast | Reliable\n");
@@ -44,17 +44,15 @@ void showProcessing()
         printf(".");
         fflush(stdout);
     }
-
-    printf("  Done!\n");
 }
 
 void showMenu()
 {
     printf("\n\n");
     printLine();
-    printf("  ||                                            ||\n");
-    printf("  ||       TYPES OF LOANS AVAILABLE             ||\n");
-    printf("  ||                                            ||\n");
+    printf("  ||                                      ||\n");
+    printf("  ||       TYPES OF LOANS AVAILABLE       ||\n");
+    printf("  ||                                      ||\n");
     printLine();
     printf("\n");
     printf("    [ 1 ]  Personal Loan\n");
