@@ -4,20 +4,28 @@
 
 #ifdef _WIN32
     #include <windows.h>
+    #include <conio.h>
 #else
     #include <unistd.h>
+    #include <termios.h>
 #endif
 
-void calculateStandardLoan(float interestRate, float processFeeRate);
-void calculateEducationLoan(float interestRate, float processFeeRate);
-void calculateSimpleInterestLoan(float interestRate, float processFeeRate);
-void calculateCreditCardLoan(float interestRate, float cardFeeRate);
+#define KEY_ENTER 13
+#define KEY_ESC   27
+
+int calculateStandardLoan(float interestRate, float processFeeRate);
+int calculateEducationLoan(float interestRate, float processFeeRate);
+int calculateSimpleInterestLoan(float interestRate, float processFeeRate);
+int calculateCreditCardLoan(float interestRate, float cardFeeRate);
 void showMenu();
 void printLine();
 void showWelcome();
 void showProcessing();
 void clearScreen();
 void waitMilliseconds(int ms);
+int  getKeyPress();
+int  waitForChoice();
+void flushInput();
 
 typedef struct {
     char name[30];
@@ -55,23 +63,79 @@ void waitMilliseconds(int ms)
     #endif
 }
 
-void calculateStandardLoan(float interestRate, float processFeeRate)
+void flushInput()
+{
+    while (getchar() != '\n');
+}
+
+int getKeyPress()
+{
+    #ifdef _WIN32
+        return _getch();
+    #else
+        int ch;
+        struct termios oldt, newt;
+
+        tcgetattr(0, &oldt);
+        newt = oldt;
+        newt.c_lflag &= ~(ICANON | ECHO);
+        tcsetattr(0, TCSANOW, &newt);
+
+        ch = getchar();
+
+        tcsetattr(0, TCSANOW, &oldt);
+        return ch;
+    #endif
+}
+
+int waitForChoice()
+{
+    int key;
+
+    printf("Press ENTER for another option or ESC to close: ");
+    fflush(stdout);
+
+    while (1)
+    {
+        key = getKeyPress();
+
+        if (key == KEY_ENTER || key == '\n')
+            return 1;
+
+        if (key == KEY_ESC)
+            return 0;
+    }
+}
+
+int calculateStandardLoan(float interestRate, float processFeeRate)
 {
     float principal, processFee, emi, total, rateInterest;
-    int months;
+    int months, tries = 0;
 
-    printf("Enter Principal Amount and Total Months:\n");
-    printf("> ");
-
-    if (scanf("%f %d", &principal, &months) != 2
-        || principal <= 0 || months <= 0)
+    while (tries < 3)
     {
-        printf("Invalid input. Please enter positive values.\n");
-        printLine();
-        return;
+        printf("Enter Principal Amount and Total Months:\n");
+        printf("> ");
+
+        if (scanf("%f %d", &principal, &months) == 2
+            && principal > 0 && months > 0)
+            break;
+
+        flushInput();
+        tries++;
+
+        if (tries < 3)
+            printf("Invalid input. Principal and months must be positive. Try again. (%d/3)\n\n", tries);
     }
 
-    processFee  = principal * processFeeRate / 100;
+    if (tries == 3)
+    {
+        printf("\nToo many invalid attempts.\n");
+        printLine();
+        return waitForChoice();
+    }
+
+    processFee   = principal * processFeeRate / 100;
     rateInterest = interestRate / (12 * 100);
 
     emi = principal *
@@ -86,22 +150,35 @@ void calculateStandardLoan(float interestRate, float processFeeRate)
     printf("Total to be repaid: Rs %.2f\n", total);
 
     printLine();
+    return -1;
 }
 
-void calculateEducationLoan(float interestRate, float processFeeRate)
+int calculateEducationLoan(float interestRate, float processFeeRate)
 {
     float principal, processFee, newPrincipal, emi, total, rateInterest;
-    int repayMonths, courseMonths;
+    int repayMonths, courseMonths, tries = 0;
 
-    printf("Enter Principal Amount, Repayment Months, Course Months:\n");
-    printf("> ");
-
-    if (scanf("%f %d %d", &principal, &repayMonths, &courseMonths) != 3
-        || principal <= 0 || repayMonths <= 0 || courseMonths <= 0)
+    while (tries < 3)
     {
-        printf("Invalid input. Please enter positive values.\n");
+        printf("Enter Principal Amount, Repayment Months, Course Months:\n");
+        printf("> ");
+
+        if (scanf("%f %d %d", &principal, &repayMonths, &courseMonths) == 3
+            && principal > 0 && repayMonths > 0 && courseMonths > 0)
+            break;
+
+        flushInput();
+        tries++;
+
+        if (tries < 3)
+            printf("Invalid input. All values must be positive. Try again. (%d/3)\n\n", tries);
+    }
+
+    if (tries == 3)
+    {
+        printf("\nToo many invalid attempts.\n");
         printLine();
-        return;
+        return waitForChoice();
     }
 
     processFee   = principal * processFeeRate / 100;
@@ -123,22 +200,35 @@ void calculateEducationLoan(float interestRate, float processFeeRate)
     printf("Total to be repaid: Rs %.2f\n", total);
 
     printLine();
+    return -1;
 }
 
-void calculateSimpleInterestLoan(float interestRate, float processFeeRate)
+int calculateSimpleInterestLoan(float interestRate, float processFeeRate)
 {
     float principal, processFee, total;
-    int months;
+    int months, tries = 0;
 
-    printf("Enter Principal Amount and Total Months:\n");
-    printf("> ");
-
-    if (scanf("%f %d", &principal, &months) != 2
-        || principal <= 0 || months <= 0)
+    while (tries < 3)
     {
-        printf("Invalid input. Please enter positive values.\n");
+        printf("Enter Principal Amount and Total Months:\n");
+        printf("> ");
+
+        if (scanf("%f %d", &principal, &months) == 2
+            && principal > 0 && months > 0)
+            break;
+
+        flushInput();
+        tries++;
+
+        if (tries < 3)
+            printf("Invalid input. Principal and months must be positive. Try again. (%d/3)\n\n", tries);
+    }
+
+    if (tries == 3)
+    {
+        printf("\nToo many invalid attempts.\n");
         printLine();
-        return;
+        return waitForChoice();
     }
 
     processFee = principal * processFeeRate / 100;
@@ -152,21 +242,35 @@ void calculateSimpleInterestLoan(float interestRate, float processFeeRate)
     printf("Total to be repaid: Rs %.2f\n", total);
 
     printLine();
+    return -1;
 }
 
-void calculateCreditCardLoan(float interestRate, float cardFeeRate)
+int calculateCreditCardLoan(float interestRate, float cardFeeRate)
 {
     float amountSpent, dailyAvgBalance, cardFee, total;
+    int tries = 0;
 
-    printf("Enter Amount Spent and Average Daily Balance:\n");
-    printf("> ");
-
-    if (scanf("%f %f", &amountSpent, &dailyAvgBalance) != 2
-        || amountSpent < 0 || dailyAvgBalance < 0)
+    while (tries < 3)
     {
-        printf("Invalid input. Please enter non-negative values.\n");
+        printf("Enter Amount Spent and Average Daily Balance:\n");
+        printf("> ");
+
+        if (scanf("%f %f", &amountSpent, &dailyAvgBalance) == 2
+            && amountSpent >= 0 && dailyAvgBalance >= 0)
+            break;
+
+        flushInput();
+        tries++;
+
+        if (tries < 3)
+            printf("Invalid input. Values cannot be negative. Try again. (%d/3)\n\n", tries);
+    }
+
+    if (tries == 3)
+    {
+        printf("\nToo many invalid attempts.\n");
         printLine();
-        return;
+        return waitForChoice();
     }
 
     cardFee = amountSpent * cardFeeRate / 100;
@@ -178,6 +282,7 @@ void calculateCreditCardLoan(float interestRate, float cardFeeRate)
     printf("Total to be repaid: Rs %.2f\n", total);
 
     printLine();
+    return -1;
 }
 
 void printLine()
@@ -249,8 +354,8 @@ int main()
 
         if (scanf("%d", &choice) != 1)
         {
+            flushInput();
             printf("Please enter a valid number.\n");
-            while (getchar() != '\n');
             continue;
         }
 
@@ -264,7 +369,6 @@ int main()
         if (choice < 1 || choice > 9)
         {
             printf("Invalid choice. Please enter a number between 0 and 9.\n");
-            printLine();
             continue;
         }
 
@@ -272,17 +376,43 @@ int main()
 
         showProcessing();
 
+        int result = -1;
+
         if (choice >= 1 && choice <= 5)
-            calculateStandardLoan(loans[choice - 1].interestRate, loans[choice - 1].feeRate);
+            result = calculateStandardLoan(loans[choice - 1].interestRate, loans[choice - 1].feeRate);
 
         else if (choice == 6)
-            calculateEducationLoan(loans[choice - 1].interestRate, loans[choice - 1].feeRate);
+            result = calculateEducationLoan(loans[choice - 1].interestRate, loans[choice - 1].feeRate);
 
         else if (choice == 7 || choice == 8)
-            calculateSimpleInterestLoan(loans[choice - 1].interestRate, loans[choice - 1].feeRate);
+            result = calculateSimpleInterestLoan(loans[choice - 1].interestRate, loans[choice - 1].feeRate);
 
         else if (choice == 9)
-            calculateCreditCardLoan(loans[choice - 1].interestRate, loans[choice - 1].feeRate);
+            result = calculateCreditCardLoan(loans[choice - 1].interestRate, loans[choice - 1].feeRate);
+
+        if (result == 0)
+        {
+            printf("\n\nThank you for using Loan Calculator. Goodbye!\n");
+            printLine();
+            break;
+        }
+
+        if (result == 1)
+        {
+            clearScreen();
+            continue;
+        }
+
+        flushInput();
+
+        if (waitForChoice() == 0)
+        {
+            printf("\n\nThank you for using Loan Calculator. Goodbye!\n");
+            printLine();
+            break;
+        }
+
+        clearScreen();
     }
 
     return 0;
