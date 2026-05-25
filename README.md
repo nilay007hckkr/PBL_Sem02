@@ -61,7 +61,7 @@ The system provides a simple and efficient terminal-based interface for performi
 
 ## 📂 Project Structure
 
-* `LMS.c` → Main source code file containing:
+* `LCS.c` → Main source code file containing:
 
   * Loan structure definition
   * Menu system
@@ -78,7 +78,7 @@ The system provides a simple and efficient terminal-based interface for performi
 2. Compile the code:
 
    ```
-   gcc LMS.c -o LCS
+   gcc LCS.c -o LCS
    ```
 3. Run the program:
 
@@ -92,7 +92,7 @@ The system provides a simple and efficient terminal-based interface for performi
 2. Compile the code:
 
    ```
-   gcc LMS.c -o LCS -lm
+   gcc LCS.c -o LCS -lm
    ```
 3. Run the program:
 
